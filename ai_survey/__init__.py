@@ -21,8 +21,8 @@ class C(BaseConstants):
     NAME_IN_URL = 'survey'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
-    # 연령 입력 허용 범위(만 나이). 오입력 방지용 범위이며, 참여 자격 기준이 있으면 여기서 조정합니다.
-    AGE_MIN = 1
+    # 연령 입력 허용 범위(만 나이). 만 18세 미만은 참여할 수 없습니다.
+    AGE_MIN = 18
     AGE_MAX = 120
     GENDER_CHOICES = [[1, '남성'], [2, '여성'], [3, '기타'], [4, '응답하고 싶지 않음']]
 

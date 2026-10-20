@@ -74,6 +74,9 @@ class PlayerBot(Bot):
         yield SubmissionMustFail(Demographics, {}, error_fields=['gender', 'age'])
         yield SubmissionMustFail(Demographics, dict(gender=2, age='25.5'), error_fields=['age'])
         yield SubmissionMustFail(Demographics, dict(gender=2, age=C.AGE_MAX + 1), error_fields=['age'])
+        # 만 18세 미만은 진행 불가
+        expect(C.AGE_MIN, 18)
+        yield SubmissionMustFail(Demographics, dict(gender=2, age=17), error_fields=['age'])
         yield SubmissionMustFail(Demographics, dict(gender=9, age=30), error_fields=['gender'])
         yield Demographics, dict(gender=2, age=30)
 
