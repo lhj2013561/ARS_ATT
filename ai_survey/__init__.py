@@ -54,19 +54,10 @@ class Player(BasePlayer):
     # 심리척도 문항(ase_01 ~ emp_04)은 items.py에서 자동으로 만듭니다.
     vars().update({item.field: likert_field(item) for item in items.ALL_ITEMS})
 
-    # 입력을 받기 위한 칸입니다. 제출 시 RewardContact로 옮기고 비우므로 응답 데이터에는 남지 않습니다.
+    # 답례품 지급용 휴대전화번호(선택). '010-1234-5678' 형식의 문자열로 저장하며, 입력하지 않으면 빈 값입니다.
     phone_number = models.StringField(blank=True, label='휴대전화번호 (선택)')
     survey_completed = models.BooleanField(initial=False)
     completion_timestamp = models.StringField(blank=True)
-
-
-class RewardContact(ExtraModel):
-    """답례품 지급용 연락처. 응답자(Player)와 연결하지 않고 세션 단위로만 저장합니다."""
-
-    subsession = models.Link(Subsession)
-    phone_number = models.StringField()
-    # 시각까지 저장하면 completion_timestamp로 응답과 짝지을 수 있으므로 날짜만 저장합니다.
-    submitted_date = models.StringField()
 
 
 # FUNCTIONS
@@ -181,13 +172,8 @@ class PhoneNumber(SurveyPage):
     @staticmethod
     def before_next_page(player, timeout_happened):
         raw = player.field_maybe_none('phone_number') or ''
-        player.phone_number = None
-        if raw.strip():
-            RewardContact.create(
-                subsession=player.subsession,
-                phone_number=normalize_phone(raw),
-                submitted_date=datetime.now(KST).date().isoformat(),
-            )
+        # 입력 형식과 관계없이 '010-1234-5678' 꼴로 통일해 저장합니다.
+        player.phone_number = normalize_phone(raw) if raw.strip() else None
         player.survey_completed = True
         player.completion_timestamp = now_kst()
 
@@ -244,7 +230,8 @@ def participation_status(research_consent, privacy_consent, completed):
 
 
 def custom_export_analysis(players):
-    """분석용 CSV: 링크에 접속한 참여자 1명당 1행. 휴대전화번호는 넣지 않습니다."""
+    """분석용 CSV: 링크에 접속한 참여자 1명당 1행. 외부 공유를 고려해 휴대전화번호는 넣지 않습니다.
+    전화번호까지 함께 보려면 oTree 기본 내보내기(ai_survey, All apps)를 쓰면 됩니다."""
     # 동의 응답은 research_consent 앱에 저장되어 있습니다.
     from research_consent import Player as ConsentPlayer
 
@@ -279,12 +266,19 @@ def custom_export_analysis(players):
 
 
 def custom_export_reward_list(players):
-    """답례품 지급 명단: 휴대전화번호만 담고 응답 자료와는 연결하지 않습니다."""
-    subsession_ids = {player.subsession_id for player in players}
-    contacts = [c for c in RewardContact.filter() if c.subsession_id in subsession_ids]
-    counts = Counter(c.phone_number for c in contacts)
-    yield ['no', 'phone_number', 'submitted_date', 'same_number_count']
-    # 제출 순서로 응답과 짝지을 수 없도록 번호순으로 정렬합니다.
-    contacts.sort(key=lambda c: (c.phone_number, c.submitted_date))
-    for no, contact in enumerate(contacts, start=1):
-        yield [no, contact.phone_number, contact.submitted_date, counts[contact.phone_number]]
+    """답례품 지급 명단: 설문을 제출하고 휴대전화번호를 입력한 참여자만 담습니다."""
+    recipients = [
+        player
+        for player in players
+        if player.survey_completed and player.field_maybe_none('phone_number')
+    ]
+    counts = Counter(player.phone_number for player in recipients)
+    yield ['no', 'participant_code', 'phone_number', 'completion_timestamp', 'same_number_count']
+    for no, player in enumerate(recipients, start=1):
+        yield [
+            no,
+            player.participant.code,
+            player.phone_number,
+            player.field_maybe_none('completion_timestamp'),
+            counts[player.phone_number],
+        ]

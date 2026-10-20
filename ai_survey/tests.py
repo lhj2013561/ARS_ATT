@@ -2,6 +2,7 @@ import html as html_lib
 import re
 
 from otree.api import Bot, Submission, SubmissionMustFail, expect
+from otree.export import get_rows_for_wide_csv
 
 import research_consent
 from research_consent.tests import BOT_CASES
@@ -12,7 +13,6 @@ from . import (
     Completed,
     Demographics,
     PhoneNumber,
-    RewardContact,
     custom_export_analysis,
     custom_export_reward_list,
     items,
@@ -126,10 +126,8 @@ class PlayerBot(Bot):
         expect(f'/{Completed.__name__}/', 'in', self.participant_bot.path)
         expect('설문 제출이 완료되었습니다', 'in', self.html)
         expect(self.player.survey_completed, True)
-        expect(self.player.field_maybe_none('phone_number'), None)
-
-        contacts = RewardContact.filter(subsession=self.subsession)
-        expect([c.phone_number for c in contacts], [stored_phone] if stored_phone else [])
+        # 전화번호는 응답 데이터의 phone_number에 '010-1234-5678' 형식으로 저장 (미입력이면 빈 값)
+        expect(self.player.field_maybe_none('phone_number'), stored_phone)
 
         self.check_no_resubmission(phone_path, answers)
         self.check_exports(answers, stored_phone)
@@ -189,10 +187,10 @@ class PlayerBot(Bot):
     def check_no_resubmission(self, phone_path, answers):
         """제출 후에는 같은 제출을 반복하거나 이전 응답을 고칠 수 없어야 함."""
         client = self.participant_bot.client
-        before = len(RewardContact.filter(subsession=self.subsession))
+        before = self.player.field_maybe_none('phone_number')
         response = client.post(phone_path, data=dict(phone_number='010-1111-2222'), allow_redirects=False)
         expect(response.status_code, 302)
-        expect(len(RewardContact.filter(subsession=self.subsession)), before)
+        expect(self.player.field_maybe_none('phone_number'), before)
 
         first_likert_index = len(research_consent.page_sequence) + 2
         first_page_path = (
@@ -223,6 +221,11 @@ class PlayerBot(Bot):
             expect(stored_phone, 'not in', [str(v) for v in values])
 
         reward_rows = list(custom_export_reward_list([self.player]))
-        expect(reward_rows[0], ['no', 'phone_number', 'submitted_date', 'same_number_count'])
-        expect([r[1] for r in reward_rows[1:]], [stored_phone] if stored_phone else [])
-        expect(self.participant.code, 'not in', [str(v) for r in reward_rows for v in r])
+        expect(reward_rows[0], ['no', 'participant_code', 'phone_number', 'completion_timestamp', 'same_number_count'])
+        expect([r[1:3] for r in reward_rows[1:]], [[self.participant.code, stored_phone]] if stored_phone else [])
+
+        # oTree 기본 내보내기(All apps)에는 전화번호가 다른 응답과 같은 줄에 들어가야 함
+        wide = get_rows_for_wide_csv(self.session.code)
+        wide_row = dict(zip(wide[0], wide[1]))
+        expect(wide_row['ai_survey.1.player.phone_number'], stored_phone or '')
+        expect(wide_row['ai_survey.1.player.ase_01'], answers['ase_01'])
