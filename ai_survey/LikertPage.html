@@ -1,0 +1,45 @@
+{{ extends "global/Page.html" }}
+
+{{ block content }}
+<div class="sv-shell">
+  {{ include "global/Progress.html" }}
+
+  <section class="sv-card sv-intro">
+    <p class="sv-eyebrow">파트 {{ spec.scale_index }} / {{ scale_count }}{{ if show_scale_name }} · {{ spec.scale_name }}{{ endif }}</p>
+    <p class="sv-instruction">{{ spec.instruction }}</p>
+  </section>
+
+  <div class="sv-items">
+    {{ for field in form }}
+    <fieldset class="sv-item{{ if field.errors }} is-invalid{{ endif }}" id="item-{{ field.name }}"
+              data-sv-check="choice" data-msg-required="이 문항에 응답해 주세요.">
+      <legend class="sv-question">
+        <span class="sv-question-num">{{ field.description }}.</span>
+        <span class="sv-question-text">{{ field.label.text|escape }}</span>
+      </legend>
+      <div class="sv-scale">
+        {{ for opt in field }}
+        <label class="sv-opt">
+          <input class="sv-opt-input" type="radio" name="{{ field.name }}" id="{{ opt.id }}" value="{{ opt.data }}"{{ if opt.checked }} checked{{ endif }}>
+          <span class="sv-opt-box">
+            <span class="sv-opt-num">{{ opt.data }}</span>
+            <span class="sv-opt-label">{{ opt.label.text }}</span>
+          </span>
+        </label>
+        {{ endfor }}
+      </div>
+      <div class="sv-error form-control-errors"{{ if not field.errors }} hidden{{ endif }}>이 문항에 응답해 주세요.</div>
+    </fieldset>
+    {{ endfor }}
+  </div>
+
+  <div class="sv-summary" role="alert" data-sv-summary{{ if not form.errors }} hidden{{ endif }}>
+    응답하지 않은 문항이 있습니다. 표시된 문항에 응답해 주세요.
+  </div>
+
+  <div class="sv-nav">
+    <button type="button" class="sv-btn sv-btn-secondary" onclick="back_button()">이전</button>
+    <button type="submit" class="sv-btn sv-btn-primary otree-btn-next">다음</button>
+  </div>
+</div>
+{{ endblock }}

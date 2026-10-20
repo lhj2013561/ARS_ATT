@@ -1,0 +1,103 @@
+{{ extends "global/Page.html" }}
+
+{{ block content }}
+<div class="sv-shell">
+  <header class="sv-doc-header">
+    <p class="sv-eyebrow">동의서 확인</p>
+    <h1 class="sv-page-title">연구참여 및 개인정보 수집·이용 동의</h1>
+    <p class="sv-lead">아래 두 동의서를 모두 읽고 각각 동의 여부를 선택해 주세요. 두 항목에 모두 동의하셔야 설문을 시작할 수 있습니다.</p>
+  </header>
+
+  {# A. 연구참여 동의서 #}
+  <section class="sv-card sv-consent" aria-labelledby="consent-research-title">
+    <p class="sv-eyebrow">동의서 1 / 2</p>
+    <h2 class="sv-consent-title" id="consent-research-title">연구참여 동의서 <span class="sv-muted">(온라인용)</span></h2>
+    <p class="sv-consent-study"><span class="sv-tag">연구 제목</span>{{ C.STUDY_TITLE }}</p>
+    <ol class="sv-statements">
+      <li>나는 이 연구의 설명문을 읽고 충분히 이해하였습니다.</li>
+      <li>나는 이 연구에 참여함으로써 발생할 위험과 이득을 숙지하였습니다.</li>
+      <li>나는 이 연구에 참여하는 것에 대하여 자발적으로 동의합니다.</li>
+      <li>나는 이 연구에서 얻어진 나에 대한 정보를 현행 법률과 가톨릭대학교 성심교정 생명윤리심의위원회 규정이 허용하는 범위 내에서 연구자가 수집하고 처리하는 데 동의합니다.</li>
+      <li>나는 담당 연구자나 위임받은 대리인이 연구를 진행하거나 결과 관리를 하는 경우와 연구기관, 연구비지원기관 및 가톨릭대학교 성심교정 생명윤리심의위원회가 실태 조사를 하는 경우에는 비밀로 유지되는 나의 개인 신상 정보를 직접적으로 열람하는 것에 동의합니다.</li>
+      <li>나는 언제라도 이 연구의 참여를 철회할 수 있고 이러한 결정이 나에게 어떠한 해도 되지 않을 것이라는 것을 압니다.</li>
+    </ol>
+
+    <fieldset class="sv-item sv-item-flat{{ if form.research_consent.errors }} is-invalid{{ endif }}"
+              data-sv-check="choice" data-sv-decline="no" data-msg-required="연구참여 동의 여부를 선택해 주세요.">
+      <legend class="sv-question"><span class="sv-question-text">연구참여 동의 여부</span></legend>
+      <div class="sv-choices">
+        {{ for opt in form.research_consent }}
+        <label class="sv-choice">
+          <input type="radio" name="research_consent" id="{{ opt.id }}" value="{{ opt.data }}"{{ if opt.checked }} checked{{ endif }}>
+          <span class="sv-choice-box">{{ opt.label.text }}</span>
+        </label>
+        {{ endfor }}
+      </div>
+      <p class="sv-decline-note" data-sv-decline-note hidden>{{ C.DECLINE_MESSAGE }}</p>
+      <div class="sv-error form-control-errors"{{ if not form.research_consent.errors }} hidden{{ endif }}>연구참여 동의 여부를 선택해 주세요.</div>
+    </fieldset>
+  </section>
+
+  {# B. 개인정보 수집·이용 동의서 #}
+  <section class="sv-card sv-consent" aria-labelledby="consent-privacy-title">
+    <p class="sv-eyebrow">동의서 2 / 2</p>
+    <h2 class="sv-consent-title" id="consent-privacy-title">연구참여자 개인정보 수집·이용 동의서 <span class="sv-muted">(온라인용)</span></h2>
+    <dl class="sv-terms">
+      <div>
+        <dt>수집하는 개인정보 항목</dt>
+        <dd><p>성별, 나이, 휴대전화번호(답례품 지급용으로 필수 응답 아님)</p></dd>
+      </div>
+      <div>
+        <dt>개인정보의 수집 및 이용 목적</dt>
+        <dd>
+          <p>제공한 정보는 연구수행 및 논문작성 등을 위해 사용한다.</p>
+          <p>연구수행을 위해 성별과 나이를 이용한다.</p>
+          <p>기본적 인권 침해의 우려가 있는 민감한 개인정보(인종 및 민족, 사상 및 신조, 정치적 성향 및 범죄기록 등)는 수집하지 않는다.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>개인정보의 제3자 제공 및 목적 외 이용</dt>
+        <dd><p>법이 요구하거나 가톨릭대학교 성심교정 생명윤리심의위원회가 연구의 실시 절차와 자료의 신뢰성을 검증하기 위해 연구 결과를 직접 열람할 수 있다.</p></dd>
+      </div>
+      <div>
+        <dt>개인정보의 보유 및 이용기간</dt>
+        <dd>
+          <p>수집된 개인정보의 보유기간은 연구 종료 후 3년까지이다.</p>
+          <p>보유기간 종료 후 개인정보를 재생이 불가능한 방법으로 파기한다.</p>
+        </dd>
+      </div>
+      <div>
+        <dt>동의 거부 권리</dt>
+        <dd>
+          <p>연구 참여자는 개인정보 수집·이용 동의를 거부할 수 있다. 다만 동의하지 않는 경우 연구 참여가 불가능할 수 있다.</p>
+          <p>동의한 내용 외의 다른 목적으로 개인정보를 활용하지 않는다.</p>
+        </dd>
+      </div>
+    </dl>
+
+    <fieldset class="sv-item sv-item-flat{{ if form.privacy_consent.errors }} is-invalid{{ endif }}"
+              data-sv-check="choice" data-sv-decline="no" data-msg-required="개인정보 수집·이용 동의 여부를 선택해 주세요.">
+      <legend class="sv-question"><span class="sv-question-text">개인정보 수집·이용 동의 여부</span></legend>
+      <div class="sv-choices">
+        {{ for opt in form.privacy_consent }}
+        <label class="sv-choice">
+          <input type="radio" name="privacy_consent" id="{{ opt.id }}" value="{{ opt.data }}"{{ if opt.checked }} checked{{ endif }}>
+          <span class="sv-choice-box">{{ opt.label.text }}</span>
+        </label>
+        {{ endfor }}
+      </div>
+      <p class="sv-decline-note" data-sv-decline-note hidden>{{ C.DECLINE_MESSAGE }}</p>
+      <div class="sv-error form-control-errors"{{ if not form.privacy_consent.errors }} hidden{{ endif }}>개인정보 수집·이용 동의 여부를 선택해 주세요.</div>
+    </fieldset>
+  </section>
+
+  <div class="sv-summary" role="alert" data-sv-summary{{ if not form.errors }} hidden{{ endif }}>
+    선택하지 않은 항목이 있습니다. 두 동의서의 동의 여부를 모두 선택해 주세요.
+  </div>
+
+  <div class="sv-nav">
+    <button type="button" class="sv-btn sv-btn-secondary" onclick="back_button()">이전</button>
+    <button type="submit" class="sv-btn sv-btn-primary otree-btn-next">설문 시작</button>
+  </div>
+</div>
+{{ endblock }}

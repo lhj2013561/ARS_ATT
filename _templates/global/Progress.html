@@ -1,0 +1,10 @@
+<div class="sv-progress">
+  <div class="sv-progress-meta">
+    <span>진행률</span>
+    <span class="sv-progress-count">{{ progress.current }} / {{ progress.total }}</span>
+  </div>
+  <div class="sv-progress-track" role="progressbar" aria-label="설문 진행률"
+       aria-valuemin="0" aria-valuemax="{{ progress.total }}" aria-valuenow="{{ progress.current }}">
+    <div class="sv-progress-fill" style="width: {{ progress.percent }}%"></div>
+  </div>
+</div>

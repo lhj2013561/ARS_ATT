@@ -1,0 +1,15 @@
+{{ extends "global/Page.html" }}
+
+{{ block content }}
+<div class="sv-shell">
+  <section class="sv-card sv-notice" role="status">
+    <h1 class="sv-page-title">연구 참여 안내</h1>
+    <p class="sv-notice-message">{{ C.DECLINE_MESSAGE }}</p>
+    <p class="sv-muted">이 창을 닫으셔도 됩니다.</p>
+  </section>
+
+  <div class="sv-nav sv-nav-single">
+    <button type="button" class="sv-btn sv-btn-secondary" onclick="back_button()">동의서로 돌아가기</button>
+  </div>
+</div>
+{{ endblock }}

@@ -1,0 +1,48 @@
+{{ extends "global/Page.html" }}
+
+{{ block content }}
+<div class="sv-shell">
+  {{ include "global/Progress.html" }}
+
+  {{ if completed }}
+  <section class="sv-card sv-done" role="status">
+    <svg class="sv-done-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="3"/>
+      <path d="M14 24.5l7 7 13-14" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1 class="sv-page-title">설문 제출이 완료되었습니다</h1>
+    <p>응답이 정상적으로 저장되었습니다. 연구에 참여해 주셔서 진심으로 감사합니다.</p>
+    <p class="sv-muted">이제 이 창을 닫으셔도 됩니다.</p>
+  </section>
+  {{ else }}
+  <section class="sv-card">
+    <h1 class="sv-page-title">설문에 참여해 주셔서 감사합니다.</h1>
+    <div class="sv-doc-body">
+      <p>연구 참여에 대한 답례품으로 GS25 모바일 상품권 3,000원권을 지급할 예정입니다.</p>
+      <p>답례품 지급을 위해 휴대전화번호를 입력해 주세요.</p>
+      <p>휴대전화번호 입력은 선택사항이며, 입력하지 않으셔도 설문을 제출할 수 있습니다. 다만, <strong>휴대전화번호를 입력하지 않으시면 답례품 지급이 어렵습니다.</strong></p>
+      <p class="sv-muted">수집한 휴대전화번호는 답례품 지급 목적으로만 이용하며, 승인된 개인정보 처리 및 보관 정책에 따라 관리됩니다.</p>
+    </div>
+
+    <div class="sv-field{{ if form.phone_number.errors }} is-invalid{{ endif }}"
+         data-sv-check="phone" data-msg-invalid="휴대전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678">
+      <label class="sv-label" for="id_phone_number">휴대전화번호 <span class="sv-optional">(선택)</span></label>
+      {# 입력값은 다시 채우지 않습니다(개인정보 노출 최소화). #}
+      <input type="tel" class="form-control sv-phone-input" id="id_phone_number" name="phone_number"
+             placeholder="010-1234-5678" inputmode="tel" autocomplete="tel" maxlength="20">
+      <p class="sv-hint">하이픈(-) 없이 숫자만 입력하셔도 됩니다.</p>
+      <div class="sv-error form-control-errors"{{ if not form.phone_number.errors }} hidden{{ endif }}>휴대전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678</div>
+    </div>
+  </section>
+
+  <div class="sv-summary" role="alert" data-sv-summary{{ if not form.errors }} hidden{{ endif }}>
+    {{ if form.non_field_error }}{{ form.non_field_error }}{{ else }}입력한 내용을 확인해 주세요.{{ endif }}
+  </div>
+
+  <div class="sv-nav">
+    <button type="button" class="sv-btn sv-btn-secondary" onclick="back_button()">이전</button>
+    <button type="submit" class="sv-btn sv-btn-primary otree-btn-next" data-busy-label="제출 중…">설문 제출</button>
+  </div>
+  {{ endif }}
+</div>
+{{ endblock }}

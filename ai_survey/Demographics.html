@@ -1,0 +1,55 @@
+{{ extends "global/Page.html" }}
+
+{{ block content }}
+<div class="sv-shell">
+  {{ include "global/Progress.html" }}
+
+  <section class="sv-card sv-intro">
+    <h1 class="sv-page-title">기본 정보</h1>
+    <p class="sv-instruction">설문을 시작하기 전에 성별과 연령을 응답해 주세요.</p>
+  </section>
+
+  <div class="sv-items">
+    <fieldset class="sv-item{{ if form.gender.errors }} is-invalid{{ endif }}"
+              data-sv-check="choice" data-msg-required="성별을 선택해 주세요.">
+      <legend class="sv-question">
+        <span class="sv-question-num">1.</span>
+        <span class="sv-question-text">성별</span>
+      </legend>
+      <div class="sv-choices sv-choices-grid">
+        {{ for opt in form.gender }}
+        <label class="sv-choice">
+          <input type="radio" name="gender" id="{{ opt.id }}" value="{{ opt.data }}"{{ if opt.checked }} checked{{ endif }}>
+          <span class="sv-choice-box">{{ opt.label.text }}</span>
+        </label>
+        {{ endfor }}
+      </div>
+      <div class="sv-error form-control-errors"{{ if not form.gender.errors }} hidden{{ endif }}>성별을 선택해 주세요.</div>
+    </fieldset>
+
+    <div class="sv-item{{ if form.age.errors }} is-invalid{{ endif }}"
+         data-sv-check="integer" data-min="{{ C.AGE_MIN }}" data-max="{{ C.AGE_MAX }}"
+         data-msg-required="연령을 입력해 주세요."
+         data-msg-invalid="만 나이를 {{ C.AGE_MIN }}~{{ C.AGE_MAX }} 사이의 정수로 입력해 주세요.">
+      <label class="sv-question" for="id_age">
+        <span class="sv-question-num">2.</span>
+        <span class="sv-question-text">연령 (만 나이)</span>
+      </label>
+      <div class="sv-input-row">
+        {{ form.age }}
+        <span class="sv-input-suffix">세</span>
+      </div>
+      <p class="sv-hint">만 나이를 숫자(정수)로 입력해 주세요.</p>
+      <div class="sv-error form-control-errors"{{ if not form.age.errors }} hidden{{ endif }}>만 나이를 {{ C.AGE_MIN }}~{{ C.AGE_MAX }} 사이의 정수로 입력해 주세요.</div>
+    </div>
+  </div>
+
+  <div class="sv-summary" role="alert" data-sv-summary{{ if not form.errors }} hidden{{ endif }}>
+    응답하지 않았거나 확인이 필요한 문항이 있습니다. 표시된 문항을 확인해 주세요.
+  </div>
+
+  <div class="sv-nav sv-nav-single">
+    <button type="submit" class="sv-btn sv-btn-primary otree-btn-next">다음</button>
+  </div>
+</div>
+{{ endblock }}
